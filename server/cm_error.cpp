@@ -6,7 +6,10 @@ const char *CMERR_AUTH = "CMERR_AUTH";
 const char *CMERR_DB = "CMERR_DB";
 const char *CMERR_EXIST = "CMERR_EXIST";
 const char *CMERR_NOT_EXIST = "CMERR_NOT_EXIST";
+const char *CMERR_OUT_OF_RANGE = "CMERR_OUT_OF_RANGE";
 
-void cm_send_error(struct lh_response_body* resp, const char *errString) {
-	lh_append(resp, errString);
+void cm_send_error(struct lh_response* resp, const char *errString) {
+	if (!resp || !errString)
+		return;
+	lh_append_body(resp, errString);
 }
