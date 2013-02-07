@@ -1,9 +1,14 @@
 #include "cm_util.h"
 #include "lh_httpd.h"
 #include <openssl/sha.h>
-#include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+namespace cm {
 
 const unsigned BASE64_MAX_LEN = 1024*1024;
 
@@ -16,7 +21,6 @@ Sha1::Sha1(const void *input, unsigned len) {
     SHA1_Final((unsigned char*)buf, &s);
 }
 
-
 static const char encodeCharacterTable[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char decodeCharacterTable[256] = {
     -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
@@ -27,7 +31,6 @@ static const char decodeCharacterTable[256] = {
     ,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
     -1,-1,-1
 };
-
 
 Base64::Base64(const void *src, unsigned inlen) {
 	if (!src || inlen == 0 || inlen > BASE64_MAX_LEN)
@@ -154,4 +157,258 @@ void Autofree::free() {
         _freeFunc(_p);
         _p = NULL;
     }
+}
+
+MemIO::MemIO(){
+    p = p0 = NULL;
+    capacity = 0;
+    overflow = false;
+}
+
+MemIO::~MemIO(){
+    
+}
+
+MemIO::MemIO(char* ptr, unsigned _capacity) {
+    p = p0 = ptr;
+    capacity = _capacity;
+}
+
+void MemIO::set(char* ptr, unsigned _capacity){
+    p = p0 = ptr;
+    capacity = _capacity;
+}
+
+unsigned MemIO::remain(){
+    int remain = p0+capacity-p;
+    remain = std::max(0, remain);
+    return remain;
+}
+
+unsigned MemIO::length(){
+    return p - p0;
+}
+
+void MemIO::write(const void *src, int size){
+    assert(src && size > 0);
+    if ( p + size > p0 + capacity ){
+        overflow = true;
+        return;
+    }
+    if ( src ){
+        memcpy(p, src, size);
+    }
+    p += size;
+}
+
+void MemIO::writeChar(char v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeUchar(unsigned char v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeShort(short v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeUshort(unsigned short v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeInt(int v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeUint(unsigned int v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeInt64(int64_t v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeUint64(uint64_t v){
+    write(&v, sizeof(v));
+}
+
+void MemIO::writeFloat(float f){
+    int n;
+    memcpy(&n, &f, 4);
+    write(&n, sizeof(n));
+}
+
+void MemIO::writeString(const char *str){
+    assert(str);
+    int size = strlen(str)+1;
+    write(str, size);
+}
+
+void MemIO::printf(const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
+    int n = vsnprintf(p, remain(), format, ap);
+    va_end(ap);
+    p += n+1;
+    if (p >= p0 + capacity)
+        overflow = true;
+}
+
+void MemIO::read(void* buf, unsigned int nbytes){
+    assert(nbytes > 0 && buf);
+    if ( p + nbytes > p0 + capacity ){
+        return;
+    }
+    memcpy(buf, p, nbytes);
+    p += nbytes;
+}
+
+void* MemIO::read(unsigned int nbytes){
+    assert(nbytes > 0);
+    if ( p + nbytes > p0 + capacity ){
+        return NULL;
+    }
+    void *pp = p;
+    p += nbytes;
+    return pp;
+}
+
+char MemIO::readChar(){
+    char* p = (char*)read(sizeof(char));
+    return *p;
+}
+
+unsigned char MemIO::readUchar(){
+    unsigned char* p = (unsigned char*)read(sizeof(unsigned char));
+    return *p;
+}
+
+short MemIO::readShort(){
+    short* p = (short*)read(sizeof(short));
+    return *p;
+}
+
+unsigned short MemIO::readUshort(){
+    unsigned short* p = (unsigned short*)read(sizeof(unsigned short));
+    return *p;
+}
+
+int MemIO::readInt(){
+    int* p = (int*)read(sizeof(int));
+    return *p;
+}
+
+unsigned int MemIO::readUint(){
+    unsigned int* p = (unsigned int*)read(sizeof(unsigned int));
+    return *p;
+}
+
+int64_t MemIO::readInt64(){
+    int64_t* p = (int64_t*)read(sizeof(int64_t));
+    return *p;
+}
+
+uint64_t MemIO::readUint64(){
+    uint64_t* p = (uint64_t*)read(sizeof(uint64_t));
+    return *p;
+}
+
+float MemIO::readFloat(){
+    float f;
+    int n = readInt();
+    memcpy(&f, &n, 4);
+    return f;
+}
+
+const char* MemIO::readString(){
+    int len = strlen(p)+1;
+    char *p= (char*)read(len);
+    return p;
+}
+
+#define _check_str_null     if (str == NULL) {      \
+                                if (err)            \
+                                    *err = 1;       \
+                                return 0;           \
+                            }
+
+int32_t s2int32(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    int32_t n = strtol(str, &pEnd, 0);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0;
+    }
+}
+
+uint32_t s2uint32(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    uint32_t n = strtoul(str, &pEnd, 0);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0;
+    }
+}
+
+int64_t s2int64(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    int64_t n = strtoll(str, &pEnd, 0);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0;
+    }
+}
+
+uint64_t s2uint64(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    uint64_t n = strtoull(str, &pEnd, 0);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0;
+    }
+}
+
+float s2float(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    float n = strtof(str, &pEnd);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0.f;
+    }
+}
+
+double s2double(const char* str, int* err) {
+    _check_str_null
+    char* pEnd = NULL;
+    double n = strtod(str, &pEnd);
+    if ((*str != '\0' && *pEnd == '\0')) {
+        return n;
+    } else {
+        if (err)
+            *err = 1;
+        return 0.0;
+    }
+}
+
 }

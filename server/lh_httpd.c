@@ -148,9 +148,7 @@ static int write_response_header(struct fd_state *state, const char* mime, int b
 		"%s\r\n";
     
     snprintf(buf, sizeof(buf), fmt, mime, body_len, user_header);
-	
     write_to_buf(state, buf, strlen(buf));
-    
     return 0;
 }
 
@@ -572,7 +570,7 @@ void lh_epoll(int timeout) {
 int lh_append_header(struct lh_response *resp, const char *key, const char* value) {
 	if (!resp || !key || !value)
 		return -1;
-	int remain = sizeof(resp->header) - resp->header_len;
+	size_t remain = sizeof(resp->header) - resp->header_len;
 	size_t len = strlen(key) + strlen(value) + 4;
 	if (len >= remain)
 		return -1;

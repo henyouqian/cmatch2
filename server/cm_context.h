@@ -5,13 +5,17 @@
 #include <hiredis/hiredis.h>
 #include <pthread.h>
 
-struct cm_context {
+namespace cm {
+
+struct context {
     PGconn *accountdb;
     PGconn *cmatchdb;
     redisContext *redis;
     pthread_t tid;
 };
 
-cm_context *cm_get_context();
+context *get_context();
+
+}
 
 #endif // CM_CONTEXT_H

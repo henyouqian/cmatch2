@@ -23,6 +23,8 @@
     <File Name="cm_util.cpp"/>
     <File Name="cm_error.h"/>
     <File Name="cm_error.cpp"/>
+    <File Name="cm_session.h"/>
+    <File Name="cm_session.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

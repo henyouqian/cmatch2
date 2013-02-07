@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
 	lh_register_callback("/stopserver", stop_server);
 	lh_register_callback("/serverpath", server_path);
-	cm_register_account_cbs();
+	cm::register_account_cbs();
 	
 	lh_start(5555, "../../www");
 	lh_loop();
