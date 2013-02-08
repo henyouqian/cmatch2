@@ -12,7 +12,7 @@ namespace cm {
 
 static const size_t NAME_LEN_MAX = 40;
 
-void cmcb_developer_register(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
+void cmcb_developer_register(const lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
 	//parse param
     int err = 0;
 	const char *username = lh_kv_string(params, "username", &err);
@@ -103,9 +103,51 @@ void cmcb_developer_login(const struct lh_kv_elem *params, const struct lh_kv_el
 	lh_append_body(resp, "{\"error\":0}");
 }
 
-void register_account_cbs() {
-	lh_register_callback("/developer/register", cmcb_developer_register);
-	lh_register_callback("/developer/login", cmcb_developer_login);	
+void cmcb_developer_relogin(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp){
+	//parse cookies
+	int err = 0;
+	const char *usertoken = lh_kv_string(cookies, "usertoken", &err);
+	if (err)
+		return cm_send_error(resp, CMERR_PARAM);
+	
+	//find session and renew
+	Session session;
+    err = cm::find_session(usertoken, session);
+    if (err)
+        return cm_send_error(resp, CMERR_AUTH);
+    
+    del_session(usertoken);
+    std::string newtoken;
+    new_session(newtoken, session.userid.c_str(), session.username.c_str());
+    
+    //cookies
+	char buf[512];
+	snprintf(buf, sizeof(buf), "usertoken=%s; path=/", newtoken.c_str());
+	lh_append_header(resp, "Set-Cookie", buf);
+    
+	//reply
+	lh_append_body(resp, "{\"error\":0}");
 }
 
+void cmcb_developer_logout(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp){
+	//parse cookies
+	int err = 0;
+	const char *usertoken = lh_kv_string(cookies, "usertoken", &err);
+	if (err)
+		return cm_send_error(resp, CMERR_PARAM);
+
+	//delete usertoken
+	del_session(usertoken);
+
+	//reply
+	lh_append_body(resp, "{\"error\":0}");
 }
+
+void register_account_cbs() {
+	lh_register_callback("/developer/register", cmcb_developer_register);
+	lh_register_callback("/developer/login", cmcb_developer_login);
+	lh_register_callback("/developer/relogin", cmcb_developer_relogin);
+	lh_register_callback("/developer/logout", cmcb_developer_logout);
+}
+
+} //namespace cm

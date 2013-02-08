@@ -614,7 +614,7 @@ void lh_clear_callback() {
 }
 
 const char* lh_kv_string(const struct lh_kv_elem *kvs, const char *key, int *error) {
-    assert(key);
+    assert(kvs && key);
     if (!kvs) {
         if (error)
             *error = 1;
@@ -628,7 +628,8 @@ const char* lh_kv_string(const struct lh_kv_elem *kvs, const char *key, int *err
 		}
         kvs = kvs->next;
     }
-    *error = 1;
+	if (error)
+		*error = 1;
     return NULL;
 }
 
