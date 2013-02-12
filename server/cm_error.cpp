@@ -14,6 +14,11 @@ const char *CMERR_REDIS = "CMERR_REDIS";
 void cm_send_error(struct lh_response* resp, const char *errString) {
 	assert(resp && errString);
 	char buf[512];
-	snprintf(buf, sizeof(buf), "{\"error\"=\"%s\"}", errString);
+	snprintf(buf, sizeof(buf), "{\"error\":\"%s\"}", errString);
 	lh_append_body(resp, buf);
+}
+
+void cm_send_ok(struct lh_response* resp) {
+	assert(resp);
+	lh_append_body(resp, "{\"error\":0}");
 }

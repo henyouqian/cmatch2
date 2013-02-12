@@ -16,8 +16,12 @@
     <File Name="cm_context.cpp"/>
     <File Name="cm_context.h"/>
     <VirtualDirectory Name="callback">
-      <File Name="cm_account.h"/>
-      <File Name="cm_account.cpp"/>
+      <VirtualDirectory Name="developer">
+        <File Name="cm_dev_account.cpp"/>
+        <File Name="cm_dev_account.h"/>
+        <File Name="cm_dev_match.cpp"/>
+        <File Name="cm_dev_match.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="cm_util.h"/>
     <File Name="cm_util.cpp"/>

@@ -1,6 +1,7 @@
 #include "cm_context.h"
 #include <assert.h>
 #include <unistd.h>
+#include <signal.h>
 
 namespace cm {
 
@@ -51,6 +52,7 @@ namespace {
             PQfinish(_context.accountdb);
             PQfinish(_context.cmatchdb);
             redisFree(_context.redis);
+			pthread_kill(_context.tid, SIGKILL);
         }
     };
     

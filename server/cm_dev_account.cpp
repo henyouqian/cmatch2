@@ -1,11 +1,10 @@
-#include "cm_account.h"
+#include "cm_dev_account.h"
 #include "cm_context.h"
 #include "cm_error.h"
 #include "cm_util.h"
 #include "lh_httpd.h"
 #include "cm_session.h"
 #include <postgresql/libpq-fe.h>
-#include <uuid/uuid.h>
 #include <string.h>
 
 namespace cm {
@@ -143,11 +142,11 @@ void cmcb_developer_logout(const struct lh_kv_elem *params, const struct lh_kv_e
 	lh_append_body(resp, "{\"error\":0}");
 }
 
-void register_account_cbs() {
-	lh_register_callback("/developer/register", cmcb_developer_register);
-	lh_register_callback("/developer/login", cmcb_developer_login);
-	lh_register_callback("/developer/relogin", cmcb_developer_relogin);
-	lh_register_callback("/developer/logout", cmcb_developer_logout);
+void register_developer_account_cbs() {
+	lh_register_callback("/cmapi/developer/register", cmcb_developer_register);
+	lh_register_callback("/cmapi/developer/login", cmcb_developer_login);
+	lh_register_callback("/cmapi/developer/relogin", cmcb_developer_relogin);
+	lh_register_callback("/cmapi/developer/logout", cmcb_developer_logout);
 }
 
 } //namespace cm
