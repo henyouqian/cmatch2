@@ -126,9 +126,7 @@ void cmdev_add_app(const struct lh_kv_elem *params, const struct lh_kv_elem *coo
     }
     
     //send to client
-	std::stringstream ss;
-	ss << "{\"error\":0, \"id\":" << appid << "}";
-	lh_append_body(resp, ss.str().c_str());
+	lh_appendf_body(resp, "{\"error\":0, \"appid\":%s}", appid);
 }
 
 void register_developer_match_cbs() {

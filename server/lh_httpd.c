@@ -22,12 +22,12 @@ THE SOFTWARE.
 
 #include "lh_httpd.h"
 #include <sys/socket.h>
-#include <sys/select.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <errno.h>
 #include <assert.h>
 #include <string.h>
@@ -533,8 +533,6 @@ void lh_epoll(int timeout) {
 			//printf("accept:%d\n", ++na);
 			if (fd < 0) {
 				perror("accept");
-			} else if (fd > FD_SETSIZE) {
-				close(fd);
 			} else {
 				int err = fcntl(fd, F_SETFL, O_NONBLOCK);
 				if (err){
@@ -583,8 +581,7 @@ int lh_append_header(struct lh_response *resp, const char *key, const char* valu
 }
 
 int lh_append_body(struct lh_response *resp, const char *src) {
-	if (!resp || !src)
-		return -1;
+	assert(resp && src);
     int remain = sizeof(resp->body) - resp->body_len;
     size_t len = strlen(src);
 	if (len >= remain)
@@ -593,6 +590,19 @@ int lh_append_body(struct lh_response *resp, const char *src) {
 	resp->body_len += len;
 	return 0;
 }
+
+int lh_appendf_body(struct lh_response *resp, const char *fmt, ...) {
+	assert(resp && fmt);
+	char buf[BODY_BUF_SIZE];
+	va_list ap;
+    va_start(ap, fmt);
+	int n = vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+	if (n < 0)
+		return -1;
+    return lh_append_body(resp, buf);
+}
+
 
 void lh_register_callback(const char *path, lh_request_callback callback) {
     assert(path && callback);

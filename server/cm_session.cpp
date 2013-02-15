@@ -54,7 +54,8 @@ int find_session(const char *token, Session &session) {
 }
 
 int find_session(const struct lh_kv_elem *cookies, Session &session) {
-	assert(cookies);
+	if (!cookies)
+		return -1;
 	int err = 0;
 	const char *usertoken = lh_kv_string(cookies, "usertoken", &err);
 	if (err)

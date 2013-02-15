@@ -15,7 +15,8 @@
   <body>
     <div class="container">
       <h2>Main</h2>
-      <a id="a_addapp" href="#">add_app</a> <br><br>
+      Welcome: <span id="username_span"></span><br><br>
+      <a id="a_addapp" class="btn btn-primary">Add app</a><br><br>
       <ul id="ul_apps">
       </ul>
     </div>
@@ -28,11 +29,10 @@
       </div>
       <div class="modal-body">
         <div class="form-signin">
-          <input id="input_username" type="text" class="input-block-level reg_input" placeholder="User name">
-          <input id="input_password" type="password" class="input-block-level reg_input" placeholder="Password">
-          <button id="btn_sign" class="btn btn-large btn-primary" type="submit">Sign up/in</button>
+          <input id="input_appname" type="text" class="input-block-level reg_input" placeholder="App name">
+          <button id="btn_add_app" class="btn btn-large btn-primary" type="submit">Submit</button>
         </div>
-        <div id="reg_alert" class="alert" style="display:none;"></div>
+        <div id="addapp_alert" class="alert" style="display:none;"></div>
       </div>
     </div>
     

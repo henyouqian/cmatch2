@@ -7,6 +7,10 @@ $(document).ready(function(){
 			login();
 		}
 	});
+	var username = getUrlParam("username");
+	if (username) {
+		$("#username").val(username);
+	}
 });
 
 function login(){
@@ -20,9 +24,10 @@ function login(){
 	$.getJSON('/cmapi/developer/login', {username:username, password:password}, function(json){
 		var err = json.error;
 		if (err==0){
-			bsalert(alert, "success", "Sign up succeed");
+			bsalert(alert, "success", "Sign in succeed and redirect to main page...");
+			window.location.href="main.html";
 		}else{
-			bsalert(alert, "error", "Sign up failed. Error=" + err);
+			bsalert(alert, "error", "Sign in failed. Error=" + err);
 		}
 	}).error(function() {
 	  	bsalert(alert, "error", "Ajax error.");
