@@ -8,8 +8,16 @@ namespace cm {
 static context _context;
 
 static void *check_thread(void* arg) {
+	int n = 0;
     while(1) {
         sleep(5);
+		n += 5;
+		if ( n > 60 ) {
+			n = 0;
+			redisReply *reply = (redisReply*)redisCommand(_context.redis, "TTL ___");
+			if (reply)
+				freeReplyObject(reply);
+		}
         if (_context.redis->err) {
             _context.redis = redisConnect("127.0.0.1", 6379);
         }

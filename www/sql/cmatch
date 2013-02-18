@@ -1,0 +1,357 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.1.8
+-- Dumped by pg_dump version 9.1.8
+-- Started on 2013-02-18 14:02:03 CST
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 167 (class 3079 OID 11681)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 1928 (class 0 OID 0)
+-- Dependencies: 167
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 162 (class 1259 OID 24597)
+-- Dependencies: 5
+-- Name: app; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE app (
+    id bigint NOT NULL,
+    name character varying(40) NOT NULL,
+    secret character varying(40) NOT NULL,
+    developer_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.app OWNER TO postgres;
+
+--
+-- TOC entry 161 (class 1259 OID 24595)
+-- Dependencies: 162 5
+-- Name: app_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE app_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.app_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1929 (class 0 OID 0)
+-- Dependencies: 161
+-- Name: app_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE app_id_seq OWNED BY app.id;
+
+
+--
+-- TOC entry 166 (class 1259 OID 24635)
+-- Dependencies: 5
+-- Name: game; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE game (
+    id bigint NOT NULL,
+    name character varying(40) NOT NULL,
+    app_id bigint NOT NULL,
+    developer_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.game OWNER TO postgres;
+
+--
+-- TOC entry 165 (class 1259 OID 24633)
+-- Dependencies: 5 166
+-- Name: game_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE game_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.game_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1930 (class 0 OID 0)
+-- Dependencies: 165
+-- Name: game_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE game_id_seq OWNED BY game.id;
+
+
+--
+-- TOC entry 164 (class 1259 OID 24624)
+-- Dependencies: 5
+-- Name: match; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE match (
+    id bigint NOT NULL,
+    name character varying(40) NOT NULL,
+    app_id bigint NOT NULL,
+    game_id bigint NOT NULL,
+    developer_id bigint NOT NULL,
+    begin timestamp without time zone NOT NULL,
+    "end" timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.match OWNER TO postgres;
+
+--
+-- TOC entry 163 (class 1259 OID 24622)
+-- Dependencies: 164 5
+-- Name: match_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE match_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.match_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1931 (class 0 OID 0)
+-- Dependencies: 163
+-- Name: match_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE match_id_seq OWNED BY match.id;
+
+
+--
+-- TOC entry 1900 (class 2604 OID 24600)
+-- Dependencies: 161 162 162
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY app ALTER COLUMN id SET DEFAULT nextval('app_id_seq'::regclass);
+
+
+--
+-- TOC entry 1902 (class 2604 OID 24638)
+-- Dependencies: 165 166 166
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY game ALTER COLUMN id SET DEFAULT nextval('game_id_seq'::regclass);
+
+
+--
+-- TOC entry 1901 (class 2604 OID 24627)
+-- Dependencies: 164 163 164
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match ALTER COLUMN id SET DEFAULT nextval('match_id_seq'::regclass);
+
+
+--
+-- TOC entry 1916 (class 0 OID 24597)
+-- Dependencies: 162 1921
+-- Data for Name: app; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY app (id, name, secret, developer_id) FROM stdin;
+6	abc	1LUG/S+IQJKyngwxtlLEYw==	9
+7	aac	BK7g+U4rQmOesMQVedwiAA==	9
+8	asdf	yWtfW7RzTGeIqzPf/XGw1g==	9
+11	asdfasdf	NmUF3/3iTl2FrDhxFD1aLQ==	47
+15	ag	PHtGjPQXSaywx/y1TYtODQ==	47
+12	a	rjqIkRTnR4a4RryM5Sl8kg==	47
+10	sadfads	H+BqfqFyQH+4TdaCJRszkg==	47
+16	aaa	HmiuGlL3QxukWuAKm1Jt5A==	48
+21	bbb	xm5sDb/wRpaURuQFNcymYA==	48
+24	ba	emh2IYxRQj2PAsQMvd9JsQ==	48
+25	cc	kvYKMXt+QSqIylWIociOCA==	48
+9	ddd	W3Z5U+cnQJ6LmsrZbNPw5A==	47
+\.
+
+
+--
+-- TOC entry 1932 (class 0 OID 0)
+-- Dependencies: 161
+-- Name: app_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('app_id_seq', 25, true);
+
+
+--
+-- TOC entry 1920 (class 0 OID 24635)
+-- Dependencies: 166 1921
+-- Data for Name: game; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY game (id, name, app_id, developer_id) FROM stdin;
+12	bb	9	47
+13	cc	9	47
+14	ccg	16	48
+11	aa	9	47
+\.
+
+
+--
+-- TOC entry 1933 (class 0 OID 0)
+-- Dependencies: 165
+-- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('game_id_seq', 14, true);
+
+
+--
+-- TOC entry 1918 (class 0 OID 24624)
+-- Dependencies: 164 1921
+-- Data for Name: match; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY match (id, name, app_id, game_id, developer_id, begin, "end") FROM stdin;
+\.
+
+
+--
+-- TOC entry 1934 (class 0 OID 0)
+-- Dependencies: 163
+-- Name: match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('match_id_seq', 1, false);
+
+
+--
+-- TOC entry 1914 (class 2606 OID 24640)
+-- Dependencies: 166 166 1922
+-- Name: game_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY game
+    ADD CONSTRAINT game_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 1910 (class 2606 OID 24629)
+-- Dependencies: 164 164 1922
+-- Name: match_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY match
+    ADD CONSTRAINT match_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 1905 (class 2606 OID 24602)
+-- Dependencies: 162 162 1922
+-- Name: pk_id; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY app
+    ADD CONSTRAINT pk_id PRIMARY KEY (id);
+
+
+--
+-- TOC entry 1907 (class 2606 OID 24612)
+-- Dependencies: 162 162 162 1922
+-- Name: uk_app_developer_name; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY app
+    ADD CONSTRAINT uk_app_developer_name UNIQUE (developer_id, name);
+
+
+--
+-- TOC entry 1911 (class 1259 OID 24646)
+-- Dependencies: 166 1922
+-- Name: fki_game_appid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX fki_game_appid ON game USING btree (app_id);
+
+
+--
+-- TOC entry 1912 (class 1259 OID 24657)
+-- Dependencies: 166 1922
+-- Name: game_app_id_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX game_app_id_idx ON game USING btree (app_id);
+
+
+--
+-- TOC entry 1903 (class 1259 OID 24603)
+-- Dependencies: 162 1922
+-- Name: idx_developer_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX idx_developer_id ON app USING btree (developer_id);
+
+
+--
+-- TOC entry 1908 (class 1259 OID 24658)
+-- Dependencies: 164 1922
+-- Name: match_app_id_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX match_app_id_idx ON match USING btree (app_id);
+
+
+--
+-- TOC entry 1927 (class 0 OID 0)
+-- Dependencies: 5
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2013-02-18 14:02:03 CST
+
+--
+-- PostgreSQL database dump complete
+--
+
