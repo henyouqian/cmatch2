@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.1.8
 -- Dumped by pg_dump version 9.1.8
--- Started on 2013-02-18 14:02:03 CST
+-- Started on 2013-02-19 16:46:31 CST
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -21,7 +21,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 1928 (class 0 OID 0)
+-- TOC entry 1922 (class 0 OID 0)
 -- Dependencies: 167
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
@@ -68,7 +68,7 @@ CREATE SEQUENCE app_id_seq
 ALTER TABLE public.app_id_seq OWNER TO postgres;
 
 --
--- TOC entry 1929 (class 0 OID 0)
+-- TOC entry 1923 (class 0 OID 0)
 -- Dependencies: 161
 -- Name: app_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -109,7 +109,7 @@ CREATE SEQUENCE game_id_seq
 ALTER TABLE public.game_id_seq OWNER TO postgres;
 
 --
--- TOC entry 1930 (class 0 OID 0)
+-- TOC entry 1924 (class 0 OID 0)
 -- Dependencies: 165
 -- Name: game_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -125,12 +125,12 @@ ALTER SEQUENCE game_id_seq OWNED BY game.id;
 
 CREATE TABLE match (
     id bigint NOT NULL,
-    name character varying(40) NOT NULL,
+    name character varying(40),
     app_id bigint NOT NULL,
     game_id bigint NOT NULL,
     developer_id bigint NOT NULL,
-    begin timestamp without time zone NOT NULL,
-    "end" timestamp without time zone NOT NULL
+    begin_time timestamp without time zone NOT NULL,
+    end_time timestamp without time zone NOT NULL
 );
 
 
@@ -153,7 +153,7 @@ CREATE SEQUENCE match_id_seq
 ALTER TABLE public.match_id_seq OWNER TO postgres;
 
 --
--- TOC entry 1931 (class 0 OID 0)
+-- TOC entry 1925 (class 0 OID 0)
 -- Dependencies: 163
 -- Name: match_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -189,81 +189,8 @@ ALTER TABLE ONLY match ALTER COLUMN id SET DEFAULT nextval('match_id_seq'::regcl
 
 
 --
--- TOC entry 1916 (class 0 OID 24597)
--- Dependencies: 162 1921
--- Data for Name: app; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY app (id, name, secret, developer_id) FROM stdin;
-6	abc	1LUG/S+IQJKyngwxtlLEYw==	9
-7	aac	BK7g+U4rQmOesMQVedwiAA==	9
-8	asdf	yWtfW7RzTGeIqzPf/XGw1g==	9
-11	asdfasdf	NmUF3/3iTl2FrDhxFD1aLQ==	47
-15	ag	PHtGjPQXSaywx/y1TYtODQ==	47
-12	a	rjqIkRTnR4a4RryM5Sl8kg==	47
-10	sadfads	H+BqfqFyQH+4TdaCJRszkg==	47
-16	aaa	HmiuGlL3QxukWuAKm1Jt5A==	48
-21	bbb	xm5sDb/wRpaURuQFNcymYA==	48
-24	ba	emh2IYxRQj2PAsQMvd9JsQ==	48
-25	cc	kvYKMXt+QSqIylWIociOCA==	48
-9	ddd	W3Z5U+cnQJ6LmsrZbNPw5A==	47
-\.
-
-
---
--- TOC entry 1932 (class 0 OID 0)
--- Dependencies: 161
--- Name: app_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('app_id_seq', 25, true);
-
-
---
--- TOC entry 1920 (class 0 OID 24635)
--- Dependencies: 166 1921
--- Data for Name: game; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY game (id, name, app_id, developer_id) FROM stdin;
-12	bb	9	47
-13	cc	9	47
-14	ccg	16	48
-11	aa	9	47
-\.
-
-
---
--- TOC entry 1933 (class 0 OID 0)
--- Dependencies: 165
--- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('game_id_seq', 14, true);
-
-
---
--- TOC entry 1918 (class 0 OID 24624)
--- Dependencies: 164 1921
--- Data for Name: match; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY match (id, name, app_id, game_id, developer_id, begin, "end") FROM stdin;
-\.
-
-
---
--- TOC entry 1934 (class 0 OID 0)
--- Dependencies: 163
--- Name: match_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('match_id_seq', 1, false);
-
-
---
 -- TOC entry 1914 (class 2606 OID 24640)
--- Dependencies: 166 166 1922
+-- Dependencies: 166 166 1916
 -- Name: game_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -273,7 +200,7 @@ ALTER TABLE ONLY game
 
 --
 -- TOC entry 1910 (class 2606 OID 24629)
--- Dependencies: 164 164 1922
+-- Dependencies: 164 164 1916
 -- Name: match_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -283,7 +210,7 @@ ALTER TABLE ONLY match
 
 --
 -- TOC entry 1905 (class 2606 OID 24602)
--- Dependencies: 162 162 1922
+-- Dependencies: 162 162 1916
 -- Name: pk_id; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -293,7 +220,7 @@ ALTER TABLE ONLY app
 
 --
 -- TOC entry 1907 (class 2606 OID 24612)
--- Dependencies: 162 162 162 1922
+-- Dependencies: 162 162 162 1916
 -- Name: uk_app_developer_name; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -303,7 +230,7 @@ ALTER TABLE ONLY app
 
 --
 -- TOC entry 1911 (class 1259 OID 24646)
--- Dependencies: 166 1922
+-- Dependencies: 166 1916
 -- Name: fki_game_appid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -312,7 +239,7 @@ CREATE INDEX fki_game_appid ON game USING btree (app_id);
 
 --
 -- TOC entry 1912 (class 1259 OID 24657)
--- Dependencies: 166 1922
+-- Dependencies: 166 1916
 -- Name: game_app_id_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -321,7 +248,7 @@ CREATE INDEX game_app_id_idx ON game USING btree (app_id);
 
 --
 -- TOC entry 1903 (class 1259 OID 24603)
--- Dependencies: 162 1922
+-- Dependencies: 162 1916
 -- Name: idx_developer_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -330,7 +257,7 @@ CREATE INDEX idx_developer_id ON app USING btree (developer_id);
 
 --
 -- TOC entry 1908 (class 1259 OID 24658)
--- Dependencies: 164 1922
+-- Dependencies: 164 1916
 -- Name: match_app_id_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -338,7 +265,7 @@ CREATE INDEX match_app_id_idx ON match USING btree (app_id);
 
 
 --
--- TOC entry 1927 (class 0 OID 0)
+-- TOC entry 1921 (class 0 OID 0)
 -- Dependencies: 5
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -349,7 +276,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2013-02-18 14:02:03 CST
+-- Completed on 2013-02-19 16:46:31 CST
 
 --
 -- PostgreSQL database dump complete

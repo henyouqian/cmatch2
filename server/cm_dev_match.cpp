@@ -11,8 +11,9 @@ namespace cm {
 	
 const uint32_t APP_NUM_LIMIT = 5;
 const uint32_t GAME_NUM_LIMIT = 20;
+const uint32_t MATCH_LIST_MAX = 50+1;
 	
-void cmdev_list_apps(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) { 
+void cmdev_list_app(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) { 
 	//check db
     PGconn *cmatchdb = cm::get_context()->cmatchdb;
     if (PQstatus(cmatchdb) != CONNECTION_OK) {
@@ -221,7 +222,7 @@ void cmdev_app_secret(const struct lh_kv_elem *params, const struct lh_kv_elem *
 	lh_appendf_body(resp, "{\"error\":0, \"secret\":\"%s\"}", secret);
 }
 
-void cmdev_list_games(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
+void cmdev_list_game(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
     //check auth
     cm::Session session;
     int err = cm::find_session(cookies, session);
@@ -335,9 +336,11 @@ void cmdev_add_game(const struct lh_kv_elem *params, const struct lh_kv_elem *co
         appid,
 		session.userid.c_str(),
     };
-    res = PQexecParams(cmatchdb,
-                       "INSERT INTO game (name, app_id, developer_id) VALUES($1, $2, $3) RETURNING id;",
-                       VAR_NUMS2, NULL, vars2, NULL, NULL, 0);
+	res = PQexecParams(	cmatchdb,
+						"INSERT INTO game (name, app_id, developer_id) "
+						"SELECT $1, $2, $3 WHERE $3=(SELECT developer_id FROM app WHERE id=$2) "
+						"RETURNING id;",
+						VAR_NUMS2, NULL, vars2, NULL, NULL, 0);
     Autofree af_res_insert(res, (Freefunc)PQclear);
     if (PQresultStatus(res) != PGRES_TUPLES_OK){
         return cm_send_error(resp, CMERR_DB);
@@ -397,15 +400,152 @@ void cmdev_edit_game(const struct lh_kv_elem *params, const struct lh_kv_elem *c
 	lh_append_body(resp, "{\"error\":0}");
 }
 
+void cmdev_list_match(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
+    //check auth
+    cm::Session session;
+    int err = cm::find_session(cookies, session);
+    if (err) {
+        return cm_send_error(resp, CMERR_AUTH);
+	}
+	
+	//check param
+	const char *appid = lh_kv_string(params, "appid", &err);
+	const char *offset = lh_kv_string(params, "offset", &err);
+	uint32_t limit = lh_kv_uint32(params, "limit", &err);
+    if (err) {
+        return cm_send_error(resp, CMERR_PARAM);
+	}
+	limit = std::min(MATCH_LIST_MAX, limit);
+	
+	//check db
+    PGconn *cmatchdb = cm::get_context()->cmatchdb;
+    if (PQstatus(cmatchdb) != CONNECTION_OK) {
+        return cm_send_error(resp, CMERR_DB);
+    }
+	
+    //qurey db
+	std::stringstream ss_limit;
+	ss_limit << limit;
+	const int VAR_NUMS = 3;
+	const char *vars[VAR_NUMS] = {
+		appid,
+		offset,
+		ss_limit.str().c_str(),
+    };
+    PGresult *res = PQexecParams(cmatchdb,
+						"SELECT id, name, begin_time, end_time, "
+							"(SELECT name FROM game WHERE id=game_id) "
+							"FROM match WHERE app_id=$1 "
+							"ORDER BY id DESC OFFSET $2 LIMIT $3;",
+						VAR_NUMS, NULL, vars, NULL, NULL, 0);
+    Autofree af_res_cl(res, (Freefunc)PQclear);
+	
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        return cm_send_error(resp, CMERR_DB);
+    }
+    
+    int rownums = PQntuples(res);
+    if (rownums == 0) {
+        return cm_send_ok(resp);
+    }
+    
+    std::stringstream ssout;
+    ssout << "{\"error\":0,\"matches\":[";
+    
+    bool first = true;
+    for (int i = 0; i < rownums; ++i) {
+        const char* id = PQgetvalue(res, i, 0);
+        const char* name = PQgetvalue(res, i, 1);
+		const char* begintime = PQgetvalue(res, i, 2);
+		const char* endtime = PQgetvalue(res, i, 3);
+		const char* gamename = PQgetvalue(res, i, 4);
+        if (id && name && begintime && endtime && gamename) {
+            if (first)
+                first = false;
+            else
+                ssout << ",";
+            ssout << "[" << id << ",\"" << name << "\",\"" << gamename << "\",\"" 
+				<< begintime << "\",\"" << endtime << "\"]";
+        }
+    }
+    ssout << "]}";
+    
+    //send to client
+	lh_append_body(resp, ssout.str().c_str());
+}
+
+void cmdev_add_match(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp) {
+    //check auth
+    cm::Session session;
+    int err = cm::find_session(cookies, session);
+    if (err) {
+        return cm_send_error(resp, CMERR_AUTH);
+	}
+    
+    //parse param
+	const char *appid = lh_kv_string(params, "appid", &err);
+	const char *gameid = lh_kv_string(params, "gameid", &err);
+	const char *begin = lh_kv_string(params, "begin", &err);
+	const char *end = lh_kv_string(params, "end", &err);
+	const char *matchname = lh_kv_string(params, "matchname", NULL);
+	if (matchname && matchname[0] == 0) {
+		matchname = NULL;
+	}
+    if (err) {
+        return cm_send_error(resp, CMERR_PARAM);
+	}
+
+	//check db
+    PGconn *cmatchdb = cm::get_context()->cmatchdb;
+    if (PQstatus(cmatchdb) != CONNECTION_OK) {
+        return cm_send_error(resp, CMERR_DB);
+    }
+	
+    //insert into db
+	const int VAR_NUMS = 6;
+    const char *vars[VAR_NUMS] = {
+		matchname,
+		gameid,
+		appid,
+		session.userid.c_str(),
+		begin,
+		end,
+    };
+	PGresult *res = PQexecParams(cmatchdb,
+								 "INSERT INTO match (name, game_id, app_id, developer_id, begin_time, end_time) "
+								 "SELECT $1, $2, $3, $4, $5::TIMESTAMP, $6::TIMESTAMP "
+									"WHERE $4=(SELECT developer_id FROM game WHERE id=$2) "
+										"AND $3=(SELECT app_id FROM game WHERE id=$2) "
+										"AND $5::TIMESTAMP<$6::TIMESTAMP "
+								 "RETURNING id;",
+								 VAR_NUMS, NULL, vars, NULL, NULL, 0);
+    Autofree af_res_insert(res, (Freefunc)PQclear);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK){
+        return cm_send_error(resp, CMERR_DB);
+    }
+
+    //get match id
+    const char* matchid = PQgetvalue(res, 0, 0);
+    if (matchid == NULL) {
+        return cm_send_error(resp, CMERR_DB);
+    }
+    
+    //send to client
+	lh_appendf_body(resp, "{\"error\":0, \"matchid\":%s}", matchid);
+}
+
 void register_developer_match_cbs() {
-	lh_register_callback("/cmapi/developer/listapps", cmdev_list_apps);
+	lh_register_callback("/cmapi/developer/listapp", cmdev_list_app);
 	lh_register_callback("/cmapi/developer/addapp", cmdev_add_app);
 	lh_register_callback("/cmapi/developer/editapp", cmdev_edit_app);
 	lh_register_callback("/cmapi/developer/appsecret", cmdev_app_secret);
 	
-	lh_register_callback("/cmapi/developer/listgames", cmdev_list_games);
+	lh_register_callback("/cmapi/developer/listgame", cmdev_list_game);
 	lh_register_callback("/cmapi/developer/addgame", cmdev_add_game);
 	lh_register_callback("/cmapi/developer/editgame", cmdev_edit_game);
+	
+	lh_register_callback("/cmapi/developer/listmatch", cmdev_list_match);
+	lh_register_callback("/cmapi/developer/addmatch", cmdev_add_match);
 }
 
 } //namespace cm

@@ -21,6 +21,8 @@
         <File Name="cm_dev_account.h"/>
         <File Name="cm_dev_match.cpp"/>
         <File Name="cm_dev_match.h"/>
+        <File Name="cm_usr_match.h"/>
+        <File Name="cm_usr_match.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="cm_util.h"/>

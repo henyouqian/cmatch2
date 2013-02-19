@@ -10,6 +10,7 @@
     </style>
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="../datetimepicker/css/datetimepicker.css" rel="stylesheet">
   </head>
 
   <body>
@@ -26,6 +27,21 @@
       <div class="tab-content">
         <div class="tab-pane active" id="tab1">
           <a id="add_match_dlg" class="btn btn-primary">Add match</a>
+          <ul class="pager">
+            <li id="match_prev_page" class="disabled"><a href="javascript:void(0)">Newer</a></li>
+            <span id="page_num">1</span>
+            <li id="match_next_page" class="disabled"><a href="javascript:void(0)">Older</a></li>
+          </ul>
+          <table id="tbl_match" class="table table-striped">
+            <tr id="tbl_match_header">
+              <th width="40px"></th>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Game</th>
+              <th>Begin time</th>
+              <th>End time</th>
+            </tr>
+          </table>
         </div>
         <div class="tab-pane" id="tab2">
           <a id="add_game_dlg" class="btn btn-primary">Add game</a>
@@ -104,21 +120,11 @@
       </div>
       <div class="modal-body">
         <div class="form-signin">
-          <select>
-            <option value ="volvo">Volvo</option>
-            <option value ="saab">Saab</option>
-            <option value="opel">Opel</option>
-            <option value="audi">Audi</option>
-            <option value ="volvo">Volvo</option>
-            <option value ="saab">Saab</option>
-            <option value="opel">Opel</option>
-            <option value="audi">Audi</option>
-            <option value ="volvo">Volvo</option>
-            <option value ="saab">Saab</option>
-            <option value="opel">Opel</option>
-            <option value="audi">Audi</option>
+          <select id="game_select">
           </select>
           <input id="input_addmatch" type="text" class="input-block-level reg_input" placeholder="Match name">
+          <input id="dtpicker_begin" size="16" type="text" readonly class="form_datetime" placeholder="Begin datetime">
+          <input id="dtpicker_end" size="16" type="text" readonly class="form_datetime" placeholder="End datetime">
           <button id="btn_addmatch" class="btn btn-large btn-primary" type="submit">Submit</button>
         </div>
       </div>
@@ -126,6 +132,7 @@
     
     <script src="../jquery/jquery-1.9.1.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
     <script src="../util.js"></script>
     <script type="text/javascript" src="app.js"></script>
   </body>

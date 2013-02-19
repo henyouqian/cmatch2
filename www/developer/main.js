@@ -5,7 +5,7 @@ $(document).ready(function(){
         $("#username_span").text(username);
     }
 
-    $.getJSON("/cmapi/developer/listapps", function(json) {
+    $.getJSON("/cmapi/developer/listapp", function(json) {
         var err = json.error;
         if (err==0) {
             var apps = json.apps;

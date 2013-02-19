@@ -1,5 +1,7 @@
 ﻿var appname;
 var appid;
+var matchesPerPage = 10;
+var currPage = 0;
 $(document).ready(function(){
 	appname = getUrlParam("appname");
     appid = getUrlParam("appid");
@@ -56,7 +58,7 @@ $(document).ready(function(){
     });
 
     //list games
-    $.getJSON("/cmapi/developer/listgames", {appid:appid}, function(json) {
+    $.getJSON("/cmapi/developer/listgame", {appid:appid}, function(json) {
         var err = json.error;
         if (err==0) {
             var games = json.games;
@@ -117,6 +119,9 @@ $(document).ready(function(){
         });
     });
 
+    //list matches
+    listMatch();
+
     //show add match dialog
     $("#add_match_dlg").click(function() {
         $("#input_addmatch").val("");
@@ -124,6 +129,64 @@ $(document).ready(function(){
             keyboard: false,
             backdrop: "static"}
         );
+        $(".form_datetime").val("");
+    });
+
+    //match begin datapicker
+    $(".form_datetime").datetimepicker({
+        format: 'yyyy-mm-dd hh:ii',
+        autoclose: true,
+        todayHighlight: true,
+        todayBtn: true,
+    });
+
+    //submit add match
+    $("#btn_addmatch").click(function() {
+        var matchname = $("#input_addmatch").val();
+        var gameid = $("#game_select").val();
+        var begin = $("#dtpicker_begin").val();
+        var end = $("#dtpicker_end").val();
+        if (!begin || !end) {
+            alert("Need begin end");
+            return;
+        }
+        if (begin >= end) {
+            alert("begin >= end");
+            return;
+        }
+        $.getJSON('/cmapi/developer/addmatch', 
+                {appid:appid, gameid:gameid, begin:begin, end:end, matchname:matchname}, function(json){
+            var err = json.error;
+            if (err==0){
+                $("#addmatch_modal").modal("hide");
+                var select = $("#game_select")[0];
+                var gamename = select.options[select.selectedIndex].text;
+                prependMatch(json.matchid, matchname, gamename, begin, end);
+            }else{
+                alert("Add match error:"+err);
+                errorProc(err);
+            }
+        });
+    });
+
+    //match page
+    $("#match_prev_page").click(function(){
+        if (currPage==0)
+            return;
+        currPage -= 1;
+        if (currPage==0)
+            $("#match_prev_page").addClass("disabled");
+        $("#page_num").text(currPage+1);
+        listMatch();
+    });
+    $("#match_next_page").click(function(){
+        if ($("#match_next_page").hasClass("disabled"))
+            return;
+        if (currPage==0)
+            $("#match_prev_page").removeClass("disabled");
+        currPage += 1;
+        $("#page_num").text(currPage+1);
+        listMatch();
     });
 });
 
@@ -144,8 +207,56 @@ function appendGame(gameid, gamename) {
             backdrop: "static"}
         );
     });
+    var optionid = "_gameoption"+gameid;
+    $("#game_select").append("<option id='"+optionid+"' value ='"+gameid+"'>"+gamename+"</option>");
 }
 
 function updateGame(gameid, gamename) {
     $("#_a"+gameid).text(gamename);
+    $("#_gameoption"+gameid).val(gameid).text(gamename);
+}
+
+function appendMatch(matchid, matchname, gamename, begintime, endtime) {
+    $("#tbl_match").append(" <tr class='match_row'>"+
+                                "<td><a href='javascript:void(0)'>Edit</a></td>"+
+                                "<td>"+matchid+"</td>"+
+                                "<td>"+matchname+"</td>"+
+                                "<td>"+gamename+"</td>"+
+                                "<td>"+begintime+"</td>"+
+                                "<td>"+endtime+"</td>"+
+                            "</tr>");
+}
+
+function prependMatch(matchid, matchname, gamename, begintime, endtime) {
+    $("#tbl_match_header").after(" <tr class='match_row'>"+
+                                "<td><a href='javascript:void(0)'>Edit</a></td>"+
+                                "<td>"+matchid+"</td>"+
+                                "<td>"+matchname+"</td>"+
+                                "<td>"+gamename+"</td>"+
+                                "<td>"+begintime+"</td>"+
+                                "<td>"+endtime+"</td>"+
+                            "</tr>");
+}
+
+function listMatch() {
+    var oldRows = $(".match_row");
+    $.getJSON("/cmapi/developer/listmatch", {appid:appid, offset:currPage*matchesPerPage, limit:matchesPerPage+1}, function(json) {
+        var err = json.error;
+        $("#match_next_page").addClass("disabled");
+        if (err==0) {
+            var matches = json.matches;
+            for (i in matches) {
+                if (i == matchesPerPage) {
+                    $("#match_next_page").removeClass("disabled");
+                    break;
+                }
+                var match = matches[i];
+                appendMatch(match[0], match[1], match[2], match[3], match[4]);
+            }
+        }else{
+            alert("List game error:"+err);
+            errorProc(err);
+        }
+        oldRows.remove();
+    })
 }
