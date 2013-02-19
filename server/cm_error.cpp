@@ -1,7 +1,5 @@
+#include "cm_prec.h"
 #include "cm_error.h"
-#include "lh_httpd.h"
-#include <assert.h>
-#include <stdio.h>
 
 const char *CMERR_PARAM = "CMERR_PARAM";
 const char *CMERR_AUTH = "CMERR_AUTH";

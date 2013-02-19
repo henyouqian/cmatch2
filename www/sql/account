@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.1.8
 -- Dumped by pg_dump version 9.1.8
--- Started on 2013-02-19 16:47:14 CST
+-- Started on 2013-02-19 19:21:30 CST
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -85,7 +85,8 @@ CREATE TABLE user_account (
     id bigint NOT NULL,
     username character varying(40) NOT NULL,
     password character varying(40) NOT NULL,
-    country integer DEFAULT 0 NOT NULL
+    country integer DEFAULT 0 NOT NULL,
+    state integer NOT NULL
 );
 
 
@@ -184,7 +185,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2013-02-19 16:47:15 CST
+-- Completed on 2013-02-19 19:21:30 CST
 
 --
 -- PostgreSQL database dump complete

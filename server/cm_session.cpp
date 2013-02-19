@@ -1,9 +1,5 @@
+#include "cm_prec.h"
 #include "cm_session.h"
-#include "cm_util.h"
-#include "cm_context.h"
-#include "lh_httpd.h"
-#include <uuid/uuid.h>
-#include <assert.h>
 
 namespace cm {
 	

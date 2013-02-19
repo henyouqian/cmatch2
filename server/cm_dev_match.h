@@ -42,7 +42,7 @@ void cmdev_list_match(const struct lh_kv_elem *params, const struct lh_kv_elem *
 //appid:id & gameid:id & begin:datetime & end:datetime & matchname:string(optional)
 void cmdev_add_match(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp);
 
-//rigester
+//register
 void register_developer_match_cbs();
 
 } //namespace cm

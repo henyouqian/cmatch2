@@ -24,3 +24,5 @@
 *.workspace.liwei
 *.workspace.session
 *~
+*.gch
+server.txt

@@ -7,13 +7,11 @@ struct lh_response;
 namespace cm {
 
 //param:
-//username:string
-//password:string
+//username:string & password:string
 void cmcb_developer_register(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp);
 
 //param:
-//username:string
-//password:string
+//username:string & password:string
 void cmcb_developer_login(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp);
 
 //param:
@@ -24,7 +22,7 @@ void cmcb_developer_relogin(const struct lh_kv_elem *params, const struct lh_kv_
 //usertoken:cookies
 void cmcb_developer_logout(const struct lh_kv_elem *params, const struct lh_kv_elem *cookies, struct lh_response* resp);
 
-
+//register
 void register_developer_account_cbs();
 
 } //namespace cm

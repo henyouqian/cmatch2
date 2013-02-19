@@ -1,12 +1,5 @@
+#include "cm_prec.h"
 #include "cm_util.h"
-#include "lh_httpd.h"
-#include <openssl/sha.h>
-#include <math.h>
-#include <string.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 namespace cm {
 

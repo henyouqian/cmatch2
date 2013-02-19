@@ -23,6 +23,8 @@
         <File Name="cm_dev_match.h"/>
         <File Name="cm_usr_match.h"/>
         <File Name="cm_usr_match.cpp"/>
+        <File Name="cm_usr_account.h"/>
+        <File Name="cm_usr_account.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="cm_util.h"/>
@@ -31,6 +33,7 @@
     <File Name="cm_error.cpp"/>
     <File Name="cm_session.h"/>
     <File Name="cm_session.cpp"/>
+    <File Name="cm_prec.h"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -43,7 +46,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-Wall;" C_Options="-g;-O0;-Wall;-std=c99" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g;-O0;-Wall;" C_Options="-g;-O0;-Wall;-std=c99" Required="yes" PreCompiledHeader="/home/liwei/projects/cmatch2/server/cm_prec.h" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -84,7 +87,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall;-std=c99" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall;-std=c99" Required="yes" PreCompiledHeader="/home/liwei/projects/cmatch2/server/prec.h" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes">

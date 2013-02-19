@@ -1,8 +1,8 @@
-#include "lh_httpd.h"
+#include "cm_prec.h"
 #include "cm_dev_account.h"
 #include "cm_dev_match.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "cm_usr_account.h"
+#include "cm_usr_match.h"
 
 const char* g_path = NULL;
 
@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	lh_register_callback("/serverpath", server_path);
 	cm::register_developer_account_cbs();
 	cm::register_developer_match_cbs();
+	cm::register_user_account_cbs();
 	
 	lh_start(5555, "../../www");
 	lh_loop();

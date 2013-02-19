@@ -1,11 +1,5 @@
+#include "cm_prec.h"
 #include "cm_dev_account.h"
-#include "cm_context.h"
-#include "cm_error.h"
-#include "cm_util.h"
-#include "lh_httpd.h"
-#include "cm_session.h"
-#include <postgresql/libpq-fe.h>
-#include <string.h>
 
 namespace cm {
 

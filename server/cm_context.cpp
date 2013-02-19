@@ -1,7 +1,6 @@
+#include "cm_prec.h"
 #include "cm_context.h"
-#include <assert.h>
-#include <unistd.h>
-#include <signal.h>
+
 
 namespace cm {
 
